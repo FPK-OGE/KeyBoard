@@ -1,47 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Регистрация</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Регистрация</title>
 </head>
 <body>
-  <h1>Регистрация</h1>
-  <form id="registerForm">
-    <input type="text" name="username" placeholder="Имя пользователя" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Пароль" required><br>
-    <button type="submit">Зарегистрироваться</button>
-  </form>
-  <p id="status"></p>
+<h1>Регистрация / Вход</h1>
 
-  <script>
-    const form = document.getElementById("registerForm");
-    const statusEl = document.getElementById("status");
+<div>
+  <input type="text" id="login" placeholder="Логин">
+  <input type="password" id="password" placeholder="Пароль">
+  <button onclick="register()">Регистрация</button>
+  <button onclick="login()">Войти</button>
+</div>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const data = Object.fromEntries(formData.entries());
-      statusEl.textContent = "Регистрация...";
+<p id="status"></p>
 
-      try {
-        const res = await fetch("http://localhost:3000/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if (result.error) {
-          statusEl.textContent = "Ошибка: " + result.error;
-        } else {
-          statusEl.textContent = "Пользователь зарегистрирован! UID: " + result.uid;
-        }
-      } catch (err) {
-        statusEl.textContent = "Ошибка запроса к серверу";
-        console.error(err);
-      }
-    });
-  </script>
+<script>
+const status = document.getElementById("status");
+const API = "http://localhost:3000"; // твой сервер
+
+function register() {
+  const login = document.getElementById("login").value;
+  const password = document.getElementById("password").value;
+  fetch(`${API}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ login, password })
+  })
+  .then(res => res.json())
+  .then(data => status.textContent = data.error || "Регистрация успешна!")
+  .catch(err => status.textContent = "Ошибка запроса к серверу");
+}
+
+function login() {
+  const login = document.getElementById("login").value;
+  const password = document.getElementById("password").value;
+  fetch(`${API}/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ login, password })
+  })
+  .then(res => res.json())
+  .then(data => status.textContent = data.error || `Привет, ${data.user.login}!`)
+  .catch(err => status.textContent = "Ошибка запроса к серверу");
+}
+</script>
 </body>
 </html>
