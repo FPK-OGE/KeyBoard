@@ -1,48 +1,45 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/KeyBoard/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>keyBoard</title>
-  </head>
-  <body>
-    <div id="root">
-      <button id="loginBtn">Войти через Telegram</button>
-      <pre id="userInfo"></pre>
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+  <title>Telegram Auth</title>
+</head>
+<body>
+  <h1>Регистрация через Telegram</h1>
+  <p id="status">Подключаемся к Telegram...</p>
 
-    <script>
-      // Проверяем, что мы в Telegram Web App
-      if (!window.Telegram?.WebApp) {
-        document.getElementById('root').innerHTML = "Откройте это в Telegram Web App!";
-      }
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
 
-      const loginBtn = document.getElementById('loginBtn');
-      const userInfo = document.getElementById('userInfo');
+    const statusEl = document.getElementById("status");
+    const initData = tg.initData;
 
-      loginBtn.addEventListener('click', async () => {
-        try {
-          // Получаем initData из Telegram
-          const initData = window.Telegram.WebApp.initData;
+    if (!initData) {
+      statusEl.textContent = "Ошибка: откройте Web App через Telegram!";
+    } else {
+      statusEl.textContent = "Отправляем данные на сервер...";
 
-          // Отправляем на сервер для создания Firebase токена
-          const res = await fetch("http://localhost:3000/auth", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ initData })
-          });
-
-          const data = await res.json();
-          if (data.token) {
-            userInfo.textContent = `Пользователь зарегистрирован!\n\n${JSON.stringify(data.user, null, 2)}`;
-          } else {
-            userInfo.textContent = `Ошибка: ${data.error || "неизвестная"}`;
-          }
-        } catch (e) {
-          userInfo.textContent = `Ошибка: ${e.message}`;
+      fetch("http://localhost:3000/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          statusEl.textContent = "Ошибка регистрации: " + data.error;
+        } else {
+          statusEl.textContent = `Привет, ${data.user.first_name}! Вы зарегистрированы.`;
         }
+      })
+      .catch(err => {
+        console.error(err);
+        statusEl.textContent = "Ошибка запроса к серверу";
       });
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
