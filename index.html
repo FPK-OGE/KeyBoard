@@ -2,44 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-  <title>Telegram Auth</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация</title>
 </head>
 <body>
-  <h1>Регистрация через Telegram</h1>
-  <p id="status">Подключаемся к Telegram...</p>
+  <h1>Регистрация</h1>
+  <form id="registerForm">
+    <input type="text" name="username" placeholder="Имя пользователя" required><br>
+    <input type="email" name="email" placeholder="Email" required><br>
+    <input type="password" name="password" placeholder="Пароль" required><br>
+    <button type="submit">Зарегистрироваться</button>
+  </form>
+  <p id="status"></p>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-
+    const form = document.getElementById("registerForm");
     const statusEl = document.getElementById("status");
-    const initData = tg.initData;
 
-    if (!initData) {
-      statusEl.textContent = "Ошибка: откройте Web App через Telegram!";
-    } else {
-      statusEl.textContent = "Отправляем данные на сервер...";
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      statusEl.textContent = "Регистрация...";
 
-      fetch("http://localhost:3000/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ initData })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          statusEl.textContent = "Ошибка регистрации: " + data.error;
+      try {
+        const res = await fetch("http://localhost:3000/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.error) {
+          statusEl.textContent = "Ошибка: " + result.error;
         } else {
-          statusEl.textContent = `Привет, ${data.user.first_name}! Вы зарегистрированы.`;
+          statusEl.textContent = "Пользователь зарегистрирован! UID: " + result.uid;
         }
-      })
-      .catch(err => {
-        console.error(err);
+      } catch (err) {
         statusEl.textContent = "Ошибка запроса к серверу";
-      });
-    }
+        console.error(err);
+      }
+    });
   </script>
 </body>
 </html>
