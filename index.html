@@ -1,51 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Регистрация</title>
-</head>
-<body>
-<h1>Регистрация / Вход</h1>
-
-<div>
-  <input type="text" id="login" placeholder="Логин">
-  <input type="password" id="password" placeholder="Пароль">
-  <button onclick="register()">Регистрация</button>
-  <button onclick="login()">Войти</button>
-</div>
-
-<p id="status"></p>
-
-<script>
-const status = document.getElementById("status");
-const API = "http://localhost:3000"; // твой сервер
-
-function register() {
-  const login = document.getElementById("login").value;
-  const password = document.getElementById("password").value;
-  fetch(`${API}/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ login, password })
-  })
-  .then(res => res.json())
-  .then(data => status.textContent = data.error || "Регистрация успешна!")
-  .catch(err => status.textContent = "Ошибка запроса к серверу");
-}
-
-function login() {
-  const login = document.getElementById("login").value;
-  const password = document.getElementById("password").value;
-  fetch(`${API}/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ login, password })
-  })
-  .then(res => res.json())
-  .then(data => status.textContent = data.error || `Привет, ${data.user.login}!`)
-  .catch(err => status.textContent = "Ошибка запроса к серверу");
-}
-</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/KeyBoard/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>keyBoard</title>
+    <script type="module" crossorigin src="/KeyBoard/assets/index-CKCRdCvO.js"></script>
+    <link rel="stylesheet" crossorigin href="/KeyBoard/assets/index-DsULQcL-.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>
