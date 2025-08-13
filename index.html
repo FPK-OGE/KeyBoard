@@ -3,13 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/KeyBoard/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>keyBoard</title>
-    <script type="module" crossorigin src="/KeyBoard/assets/index-uekM5Dpg.js"></script>
-    <link rel="stylesheet" crossorigin href="/KeyBoard/assets/index-DsULQcL-.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <button id="loginBtn">Войти через Telegram</button>
+      <pre id="userInfo"></pre>
+    </div>
+
+    <script>
+      // Проверяем, что мы в Telegram Web App
+      if (!window.Telegram?.WebApp) {
+        document.getElementById('root').innerHTML = "Откройте это в Telegram Web App!";
+      }
+
+      const loginBtn = document.getElementById('loginBtn');
+      const userInfo = document.getElementById('userInfo');
+
+      loginBtn.addEventListener('click', async () => {
+        try {
+          // Получаем initData из Telegram
+          const initData = window.Telegram.WebApp.initData;
+
+          // Отправляем на сервер для создания Firebase токена
+          const res = await fetch("http://localhost:3000/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ initData })
+          });
+
+          const data = await res.json();
+          if (data.token) {
+            userInfo.textContent = `Пользователь зарегистрирован!\n\n${JSON.stringify(data.user, null, 2)}`;
+          } else {
+            userInfo.textContent = `Ошибка: ${data.error || "неизвестная"}`;
+          }
+        } catch (e) {
+          userInfo.textContent = `Ошибка: ${e.message}`;
+        }
+      });
+    </script>
   </body>
 </html>
