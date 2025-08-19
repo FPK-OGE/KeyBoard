@@ -5,5 +5,6 @@ import App from './App.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
+    <p>1.10.1</p>
   </StrictMode>,
 )

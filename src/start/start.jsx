@@ -8,7 +8,7 @@ const Start = () => {
   return (
     <>
       <CloudsShop active={active} setActive={setActive} />
-      <MainBoard active={active} />
+      <MainBoard active={active} setActive={setActive} />
     </>
   );
 };
